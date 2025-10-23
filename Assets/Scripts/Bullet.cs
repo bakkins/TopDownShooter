@@ -8,7 +8,14 @@ public class Bullet : MonoBehaviour
 
     void Start()
     {
+        // Auto-assign the Rigidbody2D if it's not set
+        if (rb == null)
+            rb = GetComponent<Rigidbody2D>();
+
+        // Make the bullet move forward
         rb.linearVelocity = transform.up * speed;
+
+        // Destroy after 2 seconds to clean up
         Destroy(gameObject, 2f);
     }
 
@@ -18,7 +25,7 @@ public class Bullet : MonoBehaviour
         if (enemy != null)
         {
             enemy.TakeDamage(damage);
+            Destroy(gameObject);
         }
-        Destroy(gameObject);
     }
 }
