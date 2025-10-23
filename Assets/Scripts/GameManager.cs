@@ -1,12 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
+
 
 public class GameManager : MonoBehaviour
 {
     public Transform[] spawnPoints;
     public GameObject enemyPrefab;
-    public Text waveText;
+    public TextMeshProUGUI waveText;
+
 
     private int currentWave = 0;
     private int enemiesAlive = 0;
