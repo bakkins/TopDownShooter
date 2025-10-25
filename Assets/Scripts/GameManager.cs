@@ -3,13 +3,12 @@ using UnityEngine.UI;
 using System.Collections;
 using TMPro;
 
-
 public class GameManager : MonoBehaviour
 {
     public Transform[] spawnPoints;
     public GameObject enemyPrefab;
     public TextMeshProUGUI waveText;
-
+    public TextMeshProUGUI enemiesRemainingText; // 👈 NEW
 
     private int currentWave = 0;
     private int enemiesAlive = 0;
@@ -18,6 +17,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        UpdateEnemiesRemainingText(); // 👈 initialize
         StartCoroutine(StartNextWave());
     }
 
@@ -58,6 +58,18 @@ public class GameManager : MonoBehaviour
         enemy.health += currentWave;
 
         enemiesAlive++;
-        enemy.OnDeath += () => enemiesAlive--;
+        UpdateEnemiesRemainingText(); // 👈 update when spawned
+
+        enemy.OnDeath += () =>
+        {
+            enemiesAlive--;
+            UpdateEnemiesRemainingText(); // 👈 update when one dies
+        };
+    }
+
+    void UpdateEnemiesRemainingText()
+    {
+        if (enemiesRemainingText != null)
+            enemiesRemainingText.text = "Enemies Remaining: " + enemiesAlive;
     }
 }
