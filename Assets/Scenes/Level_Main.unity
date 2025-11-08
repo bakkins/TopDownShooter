@@ -398,7 +398,7 @@ MonoBehaviour:
   cam: {fileID: 1569969191}
   bulletPrefab: {fileID: 5495790916900982516, guid: 4d6c0d512372fac409cd162db6000e17, type: 3}
   firePoint: {fileID: 871283933}
-  fireRate: 0.0001
+  fireRate: 0.1
 --- !u!114 &640758873
 MonoBehaviour:
   m_ObjectHideFlags: 0
