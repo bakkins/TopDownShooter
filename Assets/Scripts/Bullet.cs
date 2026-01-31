@@ -2,29 +2,28 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float speed = 10f;
     public int damage = 1;
+    public bool piercing = false;
     public Rigidbody2D rb;
 
     void Start()
     {
-        // Auto-assign the Rigidbody2D if it's not set
-        if (rb == null)
-            rb = GetComponent<Rigidbody2D>();
-
-        // Make the bullet move forward
-        rb.linearVelocity = transform.up * speed;
-
-        // Destroy after 2 seconds to clean up
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
         Destroy(gameObject, 2f);
     }
 
-    void OnTriggerEnter2D(Collider2D hitInfo)
+    void OnTriggerEnter2D(Collider2D hit)
     {
-        Enemy enemy = hitInfo.GetComponent<Enemy>();
+        Enemy enemy = hit.GetComponent<Enemy>();
         if (enemy != null)
         {
             enemy.TakeDamage(damage);
+
+            if (!piercing)
+                Destroy(gameObject);
+        }
+        else if (!hit.CompareTag("Player") && !piercing)
+        {
             Destroy(gameObject);
         }
     }

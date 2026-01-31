@@ -2,45 +2,33 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Movement")]
     public float moveSpeed = 5f;
     public Rigidbody2D rb;
+
+    [Header("Aiming")]
     public UnityEngine.Camera cam;
-
-    Vector2 movement;
-    Vector2 mousePos;
-
-    public GameObject bulletPrefab;
-    public Transform firePoint;
-    public float fireRate = 0.2f;
-    private float fireTimer = 0f;
+    private Vector2 movement;
+    private Vector2 mousePos;
 
     void Update()
-        {
-            movement.x = Input.GetAxisRaw("Horizontal");
-            movement.y = Input.GetAxisRaw("Vertical");
-            mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+    {
+        // Movement input
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
 
-            fireTimer += Time.deltaTime;
-            if (Input.GetMouseButton(0) && fireTimer >= fireRate)
-                {
-                    Shoot();
-                    fireTimer = 0f;
-                }
-        }
-
-    void Shoot()
-        {
-            Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        }
+        // Mouse position
+        mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+    }
 
     void FixedUpdate()
-        {
-            // Move player
-            rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+    {
+        // Move player
+        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
 
-            // Rotate towards mouse
-            Vector2 lookDir = mousePos - rb.position;
-            float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
-            rb.rotation = angle;
-        }
+        // Rotate player to face mouse
+        Vector2 lookDir = mousePos - rb.position;
+        float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
+        rb.rotation = angle;
+    }
 }

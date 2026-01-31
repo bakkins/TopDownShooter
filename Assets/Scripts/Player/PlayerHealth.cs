@@ -51,4 +51,15 @@ public class PlayerHealth : MonoBehaviour
             Application.Quit(); // Quit the standalone build
         #endif
     }
+
+    public void SetMaxHealth(int max)
+        {
+            healthBar.maxValue = max;
+            healthBar.value = max;
+        }
+
+    public void UpdateHealth(int current)
+        {
+            healthBar.value = current;
+        }
 }
