@@ -594,7 +594,7 @@ Transform:
   m_GameObject: {fileID: 670133278}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 1.7, z: 0}
+  m_LocalPosition: {x: -127.5, y: -1.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -829,7 +829,7 @@ Transform:
   m_GameObject: {fileID: 962288596}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -23.7, y: -20.7, z: 0}
+  m_LocalPosition: {x: -83.6, y: -5.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -991,7 +991,7 @@ Transform:
   m_GameObject: {fileID: 1158615370}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 31.7, y: -28.1, z: 0}
+  m_LocalPosition: {x: -87.5, y: 12, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1187,7 +1187,7 @@ Transform:
   m_GameObject: {fileID: 1498986727}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 59.9, y: 11.2, z: 0}
+  m_LocalPosition: {x: -109.2, y: -25.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1218,7 +1218,7 @@ Transform:
   m_GameObject: {fileID: 1502352668}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -47.4, y: 13.4, z: 0}
+  m_LocalPosition: {x: -108.2, y: 14.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1249,7 +1249,7 @@ Transform:
   m_GameObject: {fileID: 1552385549}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.8, y: 34.8, z: 0}
+  m_LocalPosition: {x: -90.6, y: -13, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1580,7 +1580,12 @@ MonoBehaviour:
   - {fileID: 670133279}
   - {fileID: 1498986728}
   - {fileID: 1552385550}
-  enemyPrefab: {fileID: 6812997581556411244, guid: f0b2a9a6e6202c34a9f8ddd68881360f, type: 3}
+  enemyPrefabs:
+  - {fileID: 6812997581556411244, guid: f0b2a9a6e6202c34a9f8ddd68881360f, type: 3}
+  - {fileID: 6812997581556411244, guid: 6891b7cfd21e8054d8e2fe745d8e74f5, type: 3}
+  - {fileID: 6812997581556411244, guid: 2a979ee0bd10b1d428e48d61838d7685, type: 3}
+  - {fileID: 6812997581556411244, guid: b7549c24732637d4db1ea72c45740229, type: 3}
+  bossPrefab: {fileID: 6812997581556411244, guid: b4eae6c2b78bb0a40b7561dd476829c4, type: 3}
   waveText: {fileID: 1585638133}
   enemiesRemainingText: {fileID: 1888756203}
   timeBetweenWaves: 5

@@ -1,16 +1,24 @@
 using UnityEngine;
 using System;
 
+public enum EnemyType { Melee, Ranged, Tank, Fast, Boss }
+
 public class Enemy : MonoBehaviour
 {
+    public EnemyType type = EnemyType.Melee;
+
     public float speed = 2f;
     public int health = 3;
+    public int damage = 10;
+    public float knockbackForce = 5f;
+
+    [Header("Ranged Settings")]
+    public GameObject bulletPrefab;
+    public float fireRate = 1f;
+    private float fireTimer;
+
     private Transform player;
     public event Action OnDeath;
-
-    public int damage = 10;           // How much damage the enemy deals
-    public float knockbackForce = 5f; // How strong the knockback is
-
 
     void Start()
     {
@@ -19,16 +27,44 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        if (player != null)
+        if (player == null) return;
+
+        fireTimer += Time.deltaTime;
+
+        switch (type)
         {
-            Vector2 dir = (player.position - transform.position).normalized;
-            transform.position += (Vector3)dir * speed * Time.deltaTime;
+            case EnemyType.Melee:
+            case EnemyType.Tank:
+            case EnemyType.Fast:
+                MoveTowardsPlayer();
+                break;
+            case EnemyType.Ranged:
+                ShootAtPlayer();
+                break;
         }
     }
 
-    public void TakeDamage(int damage)
+    void MoveTowardsPlayer()
     {
-        health -= damage;
+        Vector2 dir = (player.position - transform.position).normalized;
+        transform.position += (Vector3)dir * speed * Time.deltaTime;
+    }
+
+    void ShootAtPlayer()
+    {
+        if (fireTimer >= fireRate)
+        {
+            Vector2 dir = (player.position - transform.position).normalized;
+            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+            rb.linearVelocity = dir * 5f; // bullet speed
+            fireTimer = 0f;
+        }
+    }
+
+    public void TakeDamage(int dmg)
+    {
+        health -= dmg;
         if (health <= 0)
         {
             OnDeath?.Invoke();
@@ -36,27 +72,21 @@ public class Enemy : MonoBehaviour
         }
     }
 
-void OnCollisionEnter2D(Collision2D collision)
-{
-    if (collision.gameObject.CompareTag("Player"))
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        // Deal damage
-        PlayerHealth player = collision.gameObject.GetComponent<PlayerHealth>();
-        if (player != null)
+        if (collision.gameObject.CompareTag("Player"))
         {
-            player.TakeDamage(damage);
-
-            // Apply knockback
+            PlayerStats playerStats = collision.gameObject.GetComponent<PlayerStats>();
             Rigidbody2D playerRb = collision.gameObject.GetComponent<Rigidbody2D>();
+
+            if (playerStats != null)
+                playerStats.TakeDamage(damage);
+
             if (playerRb != null)
             {
-                // Direction from enemy to player
-                Vector2 knockbackDir = (collision.gameObject.transform.position - transform.position).normalized;
-                playerRb.AddForce(knockbackDir * knockbackForce, ForceMode2D.Impulse);
+                Vector2 dir = (collision.transform.position - transform.position).normalized;
+                playerRb.AddForce(dir * knockbackForce, ForceMode2D.Impulse);
             }
         }
-
-        // Enemy does NOT die on contact anymore
     }
-}
 }

@@ -1,32 +1,35 @@
 using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
 using TMPro;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("Spawning")]
     public Transform[] spawnPoints;
-    public GameObject enemyPrefab;
+    public GameObject[] enemyPrefabs;    // NEW: array for all enemy types
+    public GameObject bossPrefab;        // separate prefab for boss
+
+    [Header("UI")]
     public TextMeshProUGUI waveText;
-    public TextMeshProUGUI enemiesRemainingText; // 👈 NEW
+    public TextMeshProUGUI enemiesRemainingText;
+
+    [Header("Settings")]
+    public float timeBetweenWaves = 5f;
 
     private int currentWave = 0;
     private int enemiesAlive = 0;
     private bool isSpawning = false;
-    public float timeBetweenWaves = 5f;
 
     void Start()
     {
-        UpdateEnemiesRemainingText(); // 👈 initialize
+        UpdateEnemiesRemainingText();
         StartCoroutine(StartNextWave());
     }
 
     void Update()
     {
         if (enemiesAlive <= 0 && !isSpawning)
-        {
             StartCoroutine(StartNextWave());
-        }
     }
 
     IEnumerator StartNextWave()
@@ -37,12 +40,20 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(timeBetweenWaves);
 
-        int enemyCount = 3 + currentWave * 2;
-
-        for (int i = 0; i < enemyCount; i++)
+        // Boss every 10 waves
+        if (currentWave % 10 == 0 && bossPrefab != null)
         {
-            SpawnEnemy();
-            yield return new WaitForSeconds(0.5f);
+            SpawnBoss();
+        }
+        else
+        {
+            int enemyCount = 3 + currentWave * 2;
+
+            for (int i = 0; i < enemyCount; i++)
+            {
+                SpawnEnemy();
+                yield return new WaitForSeconds(0.5f);
+            }
         }
 
         isSpawning = false;
@@ -51,19 +62,42 @@ public class GameManager : MonoBehaviour
     void SpawnEnemy()
     {
         Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
-        GameObject e = Instantiate(enemyPrefab, spawn.position, Quaternion.identity);
+
+        // Pick a random prefab from the array
+        int index = Random.Range(0, enemyPrefabs.Length);
+        GameObject prefab = enemyPrefabs[index];
+
+        GameObject e = Instantiate(prefab, spawn.position, Quaternion.identity);
         Enemy enemy = e.GetComponent<Enemy>();
 
-        enemy.speed += currentWave * 0.2f;
+        // Scale stats per wave
         enemy.health += currentWave;
+        enemy.speed += currentWave * 0.2f;
 
         enemiesAlive++;
-        UpdateEnemiesRemainingText(); // 👈 update when spawned
+        UpdateEnemiesRemainingText();
 
         enemy.OnDeath += () =>
         {
             enemiesAlive--;
-            UpdateEnemiesRemainingText(); // 👈 update when one dies
+            UpdateEnemiesRemainingText();
+        };
+    }
+
+    void SpawnBoss()
+    {
+        Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
+        GameObject boss = Instantiate(bossPrefab, spawn.position, Quaternion.identity);
+        Enemy bossEnemy = boss.GetComponent<Enemy>();
+
+        bossEnemy.health *= 5;   // Boss is tougher
+        bossEnemy.speed = 1f;
+
+        enemiesAlive++;
+        bossEnemy.OnDeath += () =>
+        {
+            enemiesAlive--;
+            UpdateEnemiesRemainingText();
         };
     }
 
