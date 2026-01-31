@@ -180,8 +180,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   type: 2
-  speed: 2
-  health: 3
+  speed: 1
+  health: 4
   damage: 10
   knockbackForce: 5
   bulletPrefab: {fileID: 5495790916900982516, guid: 4d6c0d512372fac409cd162db6000e17, type: 3}

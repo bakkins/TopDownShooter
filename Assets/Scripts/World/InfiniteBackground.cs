@@ -1,13 +1,11 @@
 using UnityEngine;
 
-public class InfiniteGridBackground : MonoBehaviour
+[RequireComponent(typeof(SpriteRenderer))]
+public class InfiniteBackground : MonoBehaviour
 {
-    [Header("References")]
-    public Transform player;              // Player transform
-
-    [Header("Parallax Settings")]
-    [Range(0f, 1f)]
-    public float parallaxStrength = 0.05f; // How much the background texture moves relative to player
+    public Transform player;
+    [Range(0f, 0.2f)]
+    public float parallaxStrength = 0.05f;
 
     private Material mat;
     private Vector2 lastPlayerPos;
@@ -16,43 +14,27 @@ public class InfiniteGridBackground : MonoBehaviour
     {
         if (player == null)
         {
-            Debug.LogError("Player reference not set on InfiniteGridBackground!");
+            Debug.LogError("Player reference not set!");
             enabled = false;
             return;
         }
 
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
-        if (sr == null)
-        {
-            Debug.LogError("No SpriteRenderer found on InfiniteGridBackground!");
-            enabled = false;
-            return;
-        }
-
         mat = sr.material;
 
-        // Ensure the material texture repeats
-        if (!mat.mainTexture.wrapMode.Equals(TextureWrapMode.Repeat))
-        {
+        if (mat.mainTexture.wrapMode != TextureWrapMode.Repeat)
             mat.mainTexture.wrapMode = TextureWrapMode.Repeat;
-        }
 
-        // Initialize last player position
         lastPlayerPos = player.position;
     }
 
     void LateUpdate()
     {
-        // 1️⃣ Calculate player delta movement
         Vector2 deltaMovement = (Vector2)player.position - lastPlayerPos;
 
-        // 2️⃣ Apply parallax to the texture offset
+        // Only move the texture for parallax effect
         mat.mainTextureOffset += deltaMovement * parallaxStrength;
 
-        // 3️⃣ Center the background on the player
-        transform.position = new Vector3(player.position.x, player.position.y, transform.position.z);
-
-        // 4️⃣ Store current player position for next frame
         lastPlayerPos = player.position;
     }
 }

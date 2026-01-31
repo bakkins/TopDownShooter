@@ -1,111 +1,128 @@
-using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerStats : MonoBehaviour
 {
-    [Header("Core Stats")]
+    [Header("Health")]
     public int maxHealth = 100;
     private int currentHealth;
+    public Slider healthBar;
 
-    [Header("Boost Stats")]
-    public float speedMultiplier = 1f;      // multiplier applied to movement speed
-    public float damageMultiplier = 1f;     // multiplier applied to bullets
-    private bool shieldActive = false;
+    [Header("Shield")]
+    public int maxShield = 50;
+    private int currentShield;
+    public Slider shieldBar;
 
-    [Header("References")]
-    public PlayerController controller;     // your movement/shooting script
-    public PlayerWeaponController weaponController; // weapon script
-    public PlayerHealth healthUI;           // health slider UI
+    [Header("Buffs")]
+    public float speedMultiplier = 1f;       // used by PlayerController
+    public float damageMultiplier = 1f;      // used by weapons
+
+    [Header("Death Settings")]
+    public bool disableControllerOnDeath = true;
+
+    private PlayerController playerController;
 
     void Start()
     {
         currentHealth = maxHealth;
-        if (healthUI != null)
+        if (healthBar != null)
         {
-            healthUI.SetMaxHealth(maxHealth);
-            healthUI.UpdateHealth(currentHealth);
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+        }
+
+        currentShield = maxShield;
+        if (shieldBar != null)
+        {
+            shieldBar.maxValue = maxShield;
+            shieldBar.value = currentShield;
+        }
+
+        playerController = GetComponent<PlayerController>();
+    }
+
+    /// <summary>
+    /// Apply damage to player: shield absorbs first, then health
+    /// </summary>
+    public void TakeDamage(int amount)
+    {
+        // Damage to shield first
+        if (currentShield > 0)
+        {
+            int shieldDamage = Mathf.Min(amount, currentShield);
+            currentShield -= shieldDamage;
+            amount -= shieldDamage;
+
+            if (shieldBar != null)
+                shieldBar.value = currentShield;
+        }
+
+        // Remaining damage to health
+        if (amount > 0)
+        {
+            currentHealth -= amount;
+            if (healthBar != null)
+                healthBar.value = currentHealth;
+
+            if (currentHealth <= 0)
+                Die();
         }
     }
 
-    // ---------------- Health ----------------
-    public void TakeDamage(int amount)
-    {
-        if (shieldActive)
-            return; // shield blocks all damage
-
-        currentHealth -= amount;
-        if (healthUI != null)
-            healthUI.UpdateHealth(currentHealth);
-
-        if (currentHealth <= 0)
-            Die();
-    }
-
+    /// <summary>
+    /// Heal health via pickups
+    /// </summary>
     public void Heal(int amount)
     {
         currentHealth += amount;
-        if (currentHealth > maxHealth)
-            currentHealth = maxHealth;
+        currentHealth = Mathf.Min(currentHealth, maxHealth);
+        if (healthBar != null)
+            healthBar.value = currentHealth;
+    }
 
-        if (healthUI != null)
-            healthUI.UpdateHealth(currentHealth);
+    /// <summary>
+    /// Recharge shield via pickups
+    /// </summary>
+    public void RechargeShield(int amount)
+    {
+        currentShield += amount;
+        currentShield = Mathf.Min(currentShield, maxShield);
+        if (shieldBar != null)
+            shieldBar.value = currentShield;
+    }
+
+    /// <summary>
+    /// Pickups will call these methods
+    /// </summary>
+    public void ApplyShield(int amount)
+    {
+        RechargeShield(amount);
+    }
+
+    public void ApplySpeedBoost(float multiplier)
+    {
+        speedMultiplier = multiplier;
+    }
+
+    public void ApplyDamageBoost(float multiplier)
+    {
+        damageMultiplier = multiplier;
     }
 
     void Die()
     {
-        controller.enabled = false;
-        weaponController.enabled = false;
-        Debug.Log("Player Died!");
+        if (disableControllerOnDeath && playerController != null)
+            playerController.enabled = false;
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-        #else
+#else
         Application.Quit();
-        #endif
+#endif
     }
 
-    // ---------------- Shield ----------------
-    public void ApplyShield(float duration)
-    {
-        if (!shieldActive)
-            StartCoroutine(ShieldRoutine(duration));
-    }
-
-    private IEnumerator ShieldRoutine(float duration)
-    {
-        shieldActive = true;
-        // Optional: add visual effect
-        yield return new WaitForSeconds(duration);
-        shieldActive = false;
-    }
-
-    // ---------------- Speed Boost ----------------
-    public void ApplySpeedBoost(float multiplier, float duration)
-    {
-        StartCoroutine(SpeedBoostRoutine(multiplier, duration));
-    }
-
-    private IEnumerator SpeedBoostRoutine(float multiplier, float duration)
-    {
-        speedMultiplier = multiplier;
-        controller.moveSpeed *= speedMultiplier; // multiply existing speed
-        yield return new WaitForSeconds(duration);
-        controller.moveSpeed /= speedMultiplier;
-        speedMultiplier = 1f;
-    }
-
-    // ---------------- Damage Boost ----------------
-    public void ApplyDamageBoost(float multiplier, float duration)
-    {
-        StartCoroutine(DamageBoostRoutine(multiplier, duration));
-    }
-
-    private IEnumerator DamageBoostRoutine(float multiplier, float duration)
-    {
-        damageMultiplier = multiplier;
-        weaponController.currentWeapon.damage = Mathf.RoundToInt(weaponController.currentWeapon.damage * damageMultiplier);
-        yield return new WaitForSeconds(duration);
-        weaponController.currentWeapon.damage = Mathf.RoundToInt(weaponController.currentWeapon.damage / damageMultiplier);
-        damageMultiplier = 1f;
-    }
+    // Optional getters
+    public int GetHealth() => currentHealth;
+    public int GetShield() => currentShield;
+    public bool IsAlive() => currentHealth > 0;
 }

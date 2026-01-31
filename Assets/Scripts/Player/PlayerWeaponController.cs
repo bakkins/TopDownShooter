@@ -2,54 +2,46 @@ using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
 {
-    [Header("Weapon")]
-    public Weapon currentWeapon;      // ScriptableObject
+    public GameObject bulletPrefab;
     public Transform firePoint;
+    public float fireRate = 0.2f;
+    public float bulletSpeed = 10f; // velocity applied here
 
-    private float fireTimer;
+    private float fireTimer = 0f;
+    private PlayerStats playerStats;
 
-    [Header("References")]
-    public Camera cam;                // Camera to get mouse position
-    public PlayerStats playerStats;   // For damage multiplier
+    void Start()
+    {
+        playerStats = GetComponent<PlayerStats>();
+    }
 
     void Update()
     {
         fireTimer += Time.deltaTime;
 
-        if (Input.GetMouseButton(0) && fireTimer >= currentWeapon.fireRate)
+        if (Input.GetMouseButton(0) && fireTimer >= fireRate)
         {
             Shoot();
             fireTimer = 0f;
         }
     }
 
-    void Shoot()
+   void Shoot()
     {
-        int count = currentWeapon.bulletCount;
-        float angleStep = (count > 1) ? currentWeapon.spreadAngle / (count - 1) : 0;
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
-        for (int i = 0; i < count; i++)
+        Bullet bulletScript = bullet.GetComponent<Bullet>();
+        if (bulletScript != null && playerStats != null)
         {
-            float angle = -currentWeapon.spreadAngle / 2 + angleStep * i;
-            Quaternion rotation = firePoint.rotation * Quaternion.Euler(0, 0, angle);
-            GameObject bullet = Instantiate(currentWeapon.bulletPrefab, firePoint.position, rotation);
+            bulletScript.damage = Mathf.RoundToInt(bulletScript.damage * playerStats.damageMultiplier);
+        }
 
-            // Set bullet velocity
-            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            rb.linearVelocity = bullet.transform.up * currentWeapon.bulletSpeed;
-
-            // Apply damage multiplier from PlayerStats
-            Bullet bulletScript = bullet.GetComponent<Bullet>();
-            if (bulletScript != null)
-            {
-                bulletScript.damage = Mathf.RoundToInt(currentWeapon.damage * playerStats.damageMultiplier);
-                bulletScript.piercing = currentWeapon.piercing;
-            }
+        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = bullet.transform.up * bulletSpeed;
         }
     }
 
-    public void UpgradeWeapon(Weapon newWeapon)
-    {
-        currentWeapon = newWeapon;
     }
-}
+
