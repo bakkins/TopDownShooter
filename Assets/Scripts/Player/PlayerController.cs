@@ -3,17 +3,26 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 5f;
     public Rigidbody2D rb;
-
-    [Header("Aiming")]
-    public UnityEngine.Camera cam;
     private Vector2 movement;
+
+    [Header("Mouse / Aim")]
+    public Camera cam;
     private Vector2 mousePos;
+
+    // Reference to PlayerStats
+    private PlayerStats stats;
+
+    void Start()
+    {
+        stats = GetComponent<PlayerStats>();
+        if (stats == null)
+            Debug.LogError("PlayerStats component not found on Player!");
+    }
 
     void Update()
     {
-        // Movement input
+        // Get input
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
@@ -23,8 +32,11 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Move player
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        if (stats == null) return;
+
+        // Move player with speed multiplier from pickups
+        float effectiveSpeed = stats.baseMoveSpeed * stats.moveSpeedMultiplier;
+        rb.MovePosition(rb.position + movement * effectiveSpeed * Time.fixedDeltaTime);
 
         // Rotate player to face mouse
         Vector2 lookDir = mousePos - rb.position;

@@ -23,6 +23,10 @@ public class GameManager : MonoBehaviour
     public int wavesBetweenBosses = 5;
     public float spawnRadius = 7f; // distance from player to spawn enemies
 
+    [Header("Currency")]
+    public int coins = 0;
+    public TextMeshProUGUI coinText;
+
     private int currentWave = 0;
     private int enemiesAlive = 0;
     private bool isSpawning = false;
@@ -37,6 +41,7 @@ public class GameManager : MonoBehaviour
 
         UpdateEnemiesRemainingText();
         StartCoroutine(StartNextWave());
+        UpdateCoinUI();
     }
 
     void Update()
@@ -147,4 +152,17 @@ public class GameManager : MonoBehaviour
         if (enemiesRemainingText != null)
             enemiesRemainingText.text = "Enemies Remaining: " + enemiesAlive;
     }
+
+    public void AddCoins(int amount)
+    {
+        coins += amount;
+        UpdateCoinUI();
+    }
+
+    void UpdateCoinUI()
+    {
+        if (coinText != null)
+            coinText.text = "Coins: " + coins;
+    }
+
 }

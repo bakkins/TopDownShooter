@@ -179,10 +179,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4456b442ca3cbf4f998793bd12fc7cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  type: 2
   speed: 1
   health: 4
   damage: 10
   knockbackForce: 5
-  bulletPrefab: {fileID: 5495790916900982516, guid: 4d6c0d512372fac409cd162db6000e17, type: 3}
-  fireRate: 1
+  coinPickupPrefab: {fileID: 226618689743718035, guid: 364a421f9a7b747429faf7cdbc97f3b6, type: 3}
+  coinsToDrop: 1

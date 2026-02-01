@@ -1,118 +1,125 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class PlayerStats : MonoBehaviour
 {
     [Header("Health")]
     public int maxHealth = 100;
-    private int currentHealth;
-    public Slider healthBar;
+    public int currentHealth;
 
     [Header("Shield")]
     public int maxShield = 50;
-    private int currentShield;
+    public int currentShield;
+
+    [Header("Movement")]
+    public float baseMoveSpeed = 5f;
+    [HideInInspector] public float moveSpeedMultiplier = 1f;
+
+    [Header("Damage")]
+    [HideInInspector] public float damageMultiplier = 1f;
+
+    [Header("UI")]
+    public Slider healthBar;
     public Slider shieldBar;
-
-    [Header("Buffs")]
-    public float speedMultiplier = 1f;       // used by PlayerController
-    public float damageMultiplier = 1f;      // used by weapons
-
-    [Header("Death Settings")]
-    public bool disableControllerOnDeath = true;
-
-    private PlayerController playerController;
 
     void Start()
     {
         currentHealth = maxHealth;
+        currentShield = maxShield;
+
+        UpdateUI();
+    }
+
+    // =========================
+    // DAMAGE HANDLING
+    // =========================
+    public void TakeDamage(int damage)
+    {
+        if (currentShield > 0)
+        {
+            int shieldDamage = Mathf.Min(currentShield, damage);
+            currentShield -= shieldDamage;
+            damage -= shieldDamage;
+        }
+
+        if (damage > 0)
+            currentHealth -= damage;
+
+        UpdateUI();
+
+        if (currentHealth <= 0)
+            Die();
+    }
+
+    // =========================
+    // PICKUP METHODS
+    // =========================
+    public void AddHealth(int amount)
+    {
+        currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
+        UpdateUI();
+    }
+
+    public void AddShield(int amount)
+    {
+        currentShield = Mathf.Min(currentShield + amount, maxShield);
+        UpdateUI();
+    }
+
+    public void ApplySpeedBoost(float duration)
+    {
+        StopCoroutine(nameof(SpeedBoostCoroutine));
+        StartCoroutine(SpeedBoostCoroutine(duration));
+    }
+
+    public void ApplyDamageBoost(float duration)
+    {
+        StopCoroutine(nameof(DamageBoostCoroutine));
+        StartCoroutine(DamageBoostCoroutine(duration));
+    }
+
+    // =========================
+    // COROUTINES
+    // =========================
+    IEnumerator SpeedBoostCoroutine(float duration)
+    {
+        moveSpeedMultiplier = 1.5f;
+        yield return new WaitForSeconds(duration);
+        moveSpeedMultiplier = 1f;
+    }
+
+    IEnumerator DamageBoostCoroutine(float duration)
+    {
+        damageMultiplier = 2f;
+        yield return new WaitForSeconds(duration);
+        damageMultiplier = 1f;
+    }
+
+    // =========================
+    // UI
+    // =========================
+    void UpdateUI()
+    {
         if (healthBar != null)
         {
             healthBar.maxValue = maxHealth;
             healthBar.value = currentHealth;
         }
 
-        currentShield = maxShield;
         if (shieldBar != null)
         {
             shieldBar.maxValue = maxShield;
             shieldBar.value = currentShield;
         }
-
-        playerController = GetComponent<PlayerController>();
     }
 
-    /// <summary>
-    /// Apply damage to player: shield absorbs first, then health
-    /// </summary>
-    public void TakeDamage(int amount)
-    {
-        // Damage to shield first
-        if (currentShield > 0)
-        {
-            int shieldDamage = Mathf.Min(amount, currentShield);
-            currentShield -= shieldDamage;
-            amount -= shieldDamage;
-
-            if (shieldBar != null)
-                shieldBar.value = currentShield;
-        }
-
-        // Remaining damage to health
-        if (amount > 0)
-        {
-            currentHealth -= amount;
-            if (healthBar != null)
-                healthBar.value = currentHealth;
-
-            if (currentHealth <= 0)
-                Die();
-        }
-    }
-
-    /// <summary>
-    /// Heal health via pickups
-    /// </summary>
-    public void Heal(int amount)
-    {
-        currentHealth += amount;
-        currentHealth = Mathf.Min(currentHealth, maxHealth);
-        if (healthBar != null)
-            healthBar.value = currentHealth;
-    }
-
-    /// <summary>
-    /// Recharge shield via pickups
-    /// </summary>
-    public void RechargeShield(int amount)
-    {
-        currentShield += amount;
-        currentShield = Mathf.Min(currentShield, maxShield);
-        if (shieldBar != null)
-            shieldBar.value = currentShield;
-    }
-
-    /// <summary>
-    /// Pickups will call these methods
-    /// </summary>
-    public void ApplyShield(int amount)
-    {
-        RechargeShield(amount);
-    }
-
-    public void ApplySpeedBoost(float multiplier)
-    {
-        speedMultiplier = multiplier;
-    }
-
-    public void ApplyDamageBoost(float multiplier)
-    {
-        damageMultiplier = multiplier;
-    }
-
+    // =========================
+    // DEATH
+    // =========================
     void Die()
     {
-        if (disableControllerOnDeath && playerController != null)
-            playerController.enabled = false;
+        GetComponent<PlayerController>().enabled = false;
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
@@ -120,9 +127,4 @@ public class PlayerStats : MonoBehaviour
         Application.Quit();
 #endif
     }
-
-    // Optional getters
-    public int GetHealth() => currentHealth;
-    public int GetShield() => currentShield;
-    public bool IsAlive() => currentHealth > 0;
 }

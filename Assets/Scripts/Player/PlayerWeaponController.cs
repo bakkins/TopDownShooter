@@ -2,17 +2,22 @@ using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
 {
+    [Header("Weapon Settings")]
     public GameObject bulletPrefab;
     public Transform firePoint;
     public float fireRate = 0.2f;
-    public float bulletSpeed = 10f; // velocity applied here
+    public float bulletSpeed = 10f;
 
     private float fireTimer = 0f;
-    private PlayerStats playerStats;
+
+    // Reference to PlayerStats for damage multiplier
+    private PlayerStats stats;
 
     void Start()
     {
-        playerStats = GetComponent<PlayerStats>();
+        stats = GetComponent<PlayerStats>();
+        if (stats == null)
+            Debug.LogError("PlayerStats component not found on Player!");
     }
 
     void Update()
@@ -26,22 +31,26 @@ public class PlayerWeaponController : MonoBehaviour
         }
     }
 
-   void Shoot()
+    void Shoot()
     {
+        if (bulletPrefab == null || firePoint == null) return;
+
+        // Instantiate bullet
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
+        // Apply PlayerStats damage multiplier
         Bullet bulletScript = bullet.GetComponent<Bullet>();
-        if (bulletScript != null && playerStats != null)
+        if (bulletScript != null && stats != null)
         {
-            bulletScript.damage = Mathf.RoundToInt(bulletScript.damage * playerStats.damageMultiplier);
+            bulletScript.damage = Mathf.RoundToInt(bulletScript.damage * stats.damageMultiplier);
         }
 
+        // Set Rigidbody2D velocity
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
-            rb.linearVelocity = bullet.transform.up * bulletSpeed;
+            rb.gravityScale = 0f; // top-down shooter
+            rb.linearVelocity = firePoint.up * bulletSpeed;
         }
     }
-
-    }
-
+}
