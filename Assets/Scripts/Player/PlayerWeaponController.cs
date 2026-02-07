@@ -53,4 +53,10 @@ public class PlayerWeaponController : MonoBehaviour
             rb.linearVelocity = firePoint.up * bulletSpeed;
         }
     }
+
+    public void UpgradeFireRate()
+    {
+        // Reduce fireRate but keep it at a minimum of 0.05 seconds
+        fireRate = Mathf.Max(0.05f, fireRate - 0.03f);
+    }
 }

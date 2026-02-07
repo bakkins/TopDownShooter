@@ -27,7 +27,6 @@ public class PlayerStats : MonoBehaviour
     {
         currentHealth = maxHealth;
         currentShield = maxShield;
-
         UpdateUI();
     }
 
@@ -45,6 +44,8 @@ public class PlayerStats : MonoBehaviour
 
         if (damage > 0)
             currentHealth -= damage;
+
+        currentHealth = Mathf.Max(currentHealth, 0);
 
         UpdateUI();
 
@@ -77,6 +78,28 @@ public class PlayerStats : MonoBehaviour
     {
         StopCoroutine(nameof(DamageBoostCoroutine));
         StartCoroutine(DamageBoostCoroutine(duration));
+    }
+
+    // =========================
+    // UPGRADE METHODS (SHOP)
+    // =========================
+    public void UpgradeHealth()
+    {
+        maxHealth += 20;
+        currentHealth = maxHealth;
+        UpdateUI();
+    }
+
+    public void UpgradeShield()
+    {
+        maxShield += 15;
+        currentShield = maxShield;
+        UpdateUI();
+    }
+
+    public void UpgradeDamage()
+    {
+        damageMultiplier += 0.2f;
     }
 
     // =========================
@@ -119,6 +142,7 @@ public class PlayerStats : MonoBehaviour
     // =========================
     void Die()
     {
+        Debug.Log("💀 Player Died! Quitting game...");
         GetComponent<PlayerController>().enabled = false;
 
 #if UNITY_EDITOR
