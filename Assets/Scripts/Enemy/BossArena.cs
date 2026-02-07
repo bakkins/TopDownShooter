@@ -9,6 +9,9 @@ public class BossArena : MonoBehaviour
     public float arenaHeight = 16f;
     public float wallThickness = 1f;
 
+    [Header("Camera")]
+    public CameraFollow cameraFollow;
+
     private List<GameObject> spawnedWalls = new List<GameObject>();
 
     public void ActivateArena(Enemy boss)
@@ -16,8 +19,12 @@ public class BossArena : MonoBehaviour
         Vector2 center = boss.transform.position;
         SpawnWalls(center);
 
+        if (cameraFollow != null)
+            cameraFollow.EnableClamp(center, arenaWidth, arenaHeight);
+
         boss.OnDeath += DeactivateArena;
     }
+
 
     void SpawnWalls(Vector2 center)
     {
@@ -82,5 +89,9 @@ public class BossArena : MonoBehaviour
         }
 
         spawnedWalls.Clear();
+
+        if (cameraFollow != null)
+            cameraFollow.DisableClamp();
     }
+
 }
