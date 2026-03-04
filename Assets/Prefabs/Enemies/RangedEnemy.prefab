@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: -6847153508578724122}
   - component: {fileID: 2142136416315310553}
   - component: {fileID: 8832206009714680667}
-  - component: {fileID: 8451797022546209108}
+  - component: {fileID: 376432950295979476}
   m_Layer: 0
   m_Name: RangedEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -84,7 +84,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 8558520778896204334, guid: 99988f061296b1d4b890b931437eccff, type: 3}
+  m_Sprite: {fileID: -6318395592028875499, guid: a5dcd6b0d7b71894cad72a05a5ec53bd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -159,7 +159,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.12, y: 0.12}
+    oldSize: {x: 0.19, y: 0.13}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -167,7 +167,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.16, y: 0.16}
   m_EdgeRadius: 0
---- !u!114 &8451797022546209108
+--- !u!114 &376432950295979476
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,12 +176,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 6812997581556411244}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4456b442ca3cbf4f998793bd12fc7cc, type: 3}
+  m_Script: {fileID: 11500000, guid: e1b6e3ac1afcab84fb62ceb17b27fbdc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  speed: 1.5
+  m_EditorClassIdentifier: Assembly-CSharp::RangedEnemy
+  speed: 2
+  maxHealth: 0
   health: 3
   damage: 10
   knockbackForce: 5
   coinPickupPrefab: {fileID: 226618689743718035, guid: 364a421f9a7b747429faf7cdbc97f3b6, type: 3}
   coinsToDrop: 1
+  projectilePrefab: {fileID: 5495790916900982516, guid: 5b71d684e6a7062438e06c68fb9eccdf, type: 3}
+  stopDistance: 6
+  fireRate: 2
